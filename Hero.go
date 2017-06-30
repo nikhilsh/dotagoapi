@@ -63,5 +63,5 @@ func main() {
 	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
 		log.Println(err)
 	}
-	fmt.Println("Phone No. = ", record.Result.Heroes[0].Name)
+	fmt.Println("First hero name = ", record.Result.Heroes[0].Name)
 }

@@ -24,6 +24,9 @@ reated by https://www.gitignore.io/api/go,macos
 # Icon must end with two \r
 Icon
 
+# Environment Files
+*.env
+
 # Thumbnails
 ._*
 

@@ -27,35 +27,19 @@ func init() {
 	gotenv.Load()
 }
 
-func main() {
-	safeAPIKey := url.QueryEscape(os.Getenv("STEAM_API_KEY"))
-	url := fmt.Sprintf("https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key=%s", safeAPIKey)
-
-	// create request
-	req, err := http.NewRequest("GET", url, nil)
+func getHeroesList() HeroResults {
+	heroesListURL := fmt.Sprintf("https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key=%s", url.QueryEscape(os.Getenv("STEAM_API_KEY")))
+	req, err := http.NewRequest("GET", heroesListURL, nil)
 	if err != nil {
 		log.Fatal("NewRequest: ", err)
-		return
+		return HeroResults{}
 	}
-
-	// For control over HTTP client headers,
-	// redirect policy, and other settings,
-	// create a Client
-	// A Client is an HTTP client
 	client := &http.Client{}
-
-	// Send the request via a client
-	// Do sends an HTTP request and
-	// returns an HTTP response
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal("Do: ", err)
-		return
+		return HeroResults{}
 	}
-
-	// Callers should close resp.Body
-	// when done reading from it
-	// Defer the closing of the body
 	defer resp.Body.Close()
 
 	var record HeroResults
@@ -63,5 +47,33 @@ func main() {
 	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
 		log.Println(err)
 	}
-	fmt.Println("First hero name = ", record.Result.Heroes[0].Name)
+	return record
+}
+
+func getImageFor(heroName string) []byte {
+	heroImageURL := fmt.Sprintf("http://cdn.dota2.com/apps/dota2/images/heroes/%s_sb.png", heroName)
+	req, err := http.NewRequest("GET", heroImageURL, nil)
+	if err != nil {
+		log.Fatal("NewRequest: ", err)
+		return []byte{}
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal("Do: ", err)
+		return []byte{}
+	}
+	defer resp.Body.Close()
+
+	var record HeroResults
+
+	if err := json.NewDecoder(resp.Body).Decode(&record); err != nil {
+		log.Println(err)
+	}
+
+	//save image to database with hero name
+	return []byte{}
+}
+
+func main() {
 }
